@@ -31,10 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
               .collection('users')
               .doc(user.uid)
               .get();
-      setState(() {
-        username = doc['username'];
-        email = user.email;
-      });
+      if (mounted) {
+        setState(() {
+          username = doc['username'];
+          email = user.email;
+        });
+      }
     }
   }
 

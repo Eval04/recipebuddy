@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'pages/splash_screen.dart';
-import 'package:flutter_application_1/pages/login_screen.dart'; // ganti sesuai strukturmu
+import 'package:flutter_application_1/pages/login_screen.dart';
 
 void main() {
   runApp(const AppInitializer());

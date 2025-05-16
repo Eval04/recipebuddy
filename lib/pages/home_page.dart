@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../widgets/custom_navbar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? username;
+  int selectedIndex = 1;
 
   @override
   void initState() {
@@ -33,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Simulasi data resep
   final List<Map<String, dynamic>> recipes = [
     {
       "title": "Hash Brown",
@@ -82,8 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
-
-              // Grid Resep
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -165,24 +164,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color(0xFFFAF5F2),
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.menu, size: 28),
-              CircleAvatar(
-                backgroundColor: Color(0xFFD0B8AC),
-                radius: 24,
-                child: Icon(Icons.home, size: 28, color: Colors.black),
-              ),
-              Icon(Icons.search, size: 28),
-            ],
-          ),
-        ),
+      bottomNavigationBar: CustomNavbar(
+        selectedIndex: selectedIndex,
+        onTap: (index) {
+          setState(() {
+            selectedIndex = index;
+            // Tambahkan logika navigasi jika perlu
+          });
+        },
       ),
     );
   }

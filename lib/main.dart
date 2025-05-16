@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'pages/splash_screen.dart';
+import 'package:flutter_application_1/pages/login_screen.dart'; // ganti sesuai strukturmu
 
 void main() {
   runApp(const AppInitializer());
@@ -65,9 +66,15 @@ class RecipeBuddyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginScreen(),
+        // Tambahkan route lain seperti home jika perlu
+        // '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }

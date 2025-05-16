@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/recipe_detail_screen.dart';
+import 'package:flutter_application_1/widgets/custom_bottom_navbar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +13,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? username;
+  String? email;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -26,42 +31,45 @@ class _HomeScreenState extends State<HomeScreen> {
               .collection('users')
               .doc(user.uid)
               .get();
-
       setState(() {
         username = doc['username'];
+        email = user.email;
       });
     }
   }
 
-  // Simulasi data resep
-  final List<Map<String, dynamic>> recipes = [
-    {
-      "title": "Hash Brown",
-      "duration": "20 Menit",
-      "image": "assets/menu/Hash_Brown.png",
-    },
-    {
-      "title": "Fluffy Pancake",
-      "duration": "17 Menit",
-      "image": "assets/menu/Fluffy_Pancake.png",
-    },
-    {
-      "title": "Dimsum Ayam",
-      "duration": "60 Menit",
-      "image": "assets/menu/Dimsum_Ayam.png",
-    },
-    {
-      "title": "Tamagoyaki",
-      "duration": "10 Menit",
-      "image": "assets/menu/Tamagoyaki.png",
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final themeColor = const Color(0xFFD0B8AC);
-
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(username ?? 'Loading...'),
+              accountEmail: Text(email ?? ''),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.brown,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+            ),
+            const Spacer(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (_) => false,
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
       backgroundColor: const Color(0xFFFAF5F2),
       body: SafeArea(
         child: Padding(
@@ -82,107 +90,116 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
-
-              // Grid Resep
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  children:
-                      recipes.map((recipe) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: themeColor,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(8),
-                                ),
-                                child: Image.asset(
-                                  recipe['image'],
-                                  height: 100,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          const Icon(
-                                            Icons.broken_image,
-                                            size: 80,
-                                          ),
-                                ),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream:
+                      FirebaseFirestore.instance
+                          .collection('recipes')
+                          .orderBy(
+                            'createdAt',
+                            descending: true,
+                          ) // ⬅ urut terbaru
+                          .limit(15) // ⬅ maksimum 15 resep
+                          .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(child: Text('Belum ada resep'));
+                    }
+
+                    final recipes = snapshot.data!.docs;
+
+                    return ListView.builder(
+                      itemCount: recipes.length,
+                      itemBuilder: (context, index) {
+                        final doc = recipes[index];
+                        final data = doc.data() as Map<String, dynamic>;
+                        final docId = doc.id;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => RecipeDetailScreen(recipeId: docId),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 6,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      recipe['title'],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                            );
+                          },
+                          child: Card(
+                            elevation: 2,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            color: const Color(0xFFFFF5EE),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data['title'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.brown,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.access_time, size: 16),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    data['desc'] ?? '',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.grey[800]),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.schedule,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        data['duration'] ?? '',
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                      if (data.containsKey('serving')) ...[
+                                        const SizedBox(width: 16),
+                                        const Icon(
+                                          Icons.people_outline,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
                                         const SizedBox(width: 4),
-                                        Text(recipe['duration']),
+                                        Text(
+                                          '${data['serving']} porsi',
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
                                       ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.brown[900],
-                                        ),
-                                        onPressed: () {},
-                                        child: const Text(
-                                          'Simpan',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         );
-                      }).toList(),
+                      },
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color(0xFFFAF5F2),
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.menu, size: 28),
-              CircleAvatar(
-                backgroundColor: Color(0xFFD0B8AC),
-                radius: 24,
-                child: Icon(Icons.home, size: 28, color: Colors.black),
-              ),
-              Icon(Icons.search, size: 28),
-            ],
-          ),
-        ),
+      bottomNavigationBar: CustomBottomNavbar(
+        currentPage: 'home',
+        onMenuPressed: () => _scaffoldKey.currentState?.openDrawer(),
       ),
     );
   }

@@ -57,6 +57,6 @@ class DefaultFirebaseOptions {
     appId: '1:234322256199:android:856f704aed16d82b5f6c62',
     messagingSenderId: '234322256199',
     projectId: 'recipebuddy-afc96',
-    storageBucket: 'recipebuddy-afc96.firebasestorage.app',
+    storageBucket: 'recipebuddy-afc96.appspot.com', // ✅ FIXED
   );
 }

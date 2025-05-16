@@ -95,11 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   stream:
                       FirebaseFirestore.instance
                           .collection('recipes')
-                          .orderBy(
-                            'createdAt',
-                            descending: true,
-                          ) // ⬅ urut terbaru
-                          .limit(15) // ⬅ maksimum 15 resep
+                          .orderBy('createdAt', descending: true)
+                          .limit(15)
                           .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {

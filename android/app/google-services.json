@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "234322256199",
+    "project_id": "recipebuddy-afc96",
+    "storage_bucket": "recipebuddy-afc96.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234322256199:android:856f704aed16d82b5f6c62",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm4tqmzOaUghF7HfejXcX1VppxDDRR4Pg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

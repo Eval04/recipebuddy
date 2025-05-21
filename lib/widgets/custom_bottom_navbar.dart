@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/home_page.dart';
-import 'package:flutter_application_1/pages/cari_resep.dart';
+import 'package:RecipeBuddy/pages/home_page.dart';
+import 'package:RecipeBuddy/pages/cari_resep.dart';
 
 class CustomBottomNavbar extends StatelessWidget {
   final String currentPage;

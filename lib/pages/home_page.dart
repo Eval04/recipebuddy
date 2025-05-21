@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/recipe_detail_screen.dart';
-import 'package:flutter_application_1/widgets/custom_bottom_navbar.dart';
+import 'package:RecipeBuddy/pages/recipe_detail_screen.dart';
+import 'package:RecipeBuddy/widgets/custom_bottom_navbar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
